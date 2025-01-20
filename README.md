@@ -17,7 +17,7 @@
 
 ## Configurar o arquivo config.json:
 - Adicione no vetor computers:
--- o ip dos computadores que serão utilizados;
--- suas respectivas portas;
--- a quantidade de nucleos que deseja utilizar em cada pc
+  - o ip dos computadores que serão utilizados;
+  - suas respectivas portas;
+  - a quantidade de nucleos que deseja utilizar em cada pc
 
