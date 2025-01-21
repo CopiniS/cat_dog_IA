@@ -3,6 +3,8 @@
 ## Instalar o python:
 - vai na microsoft store e baixa o python, eu instalei o 3.12
 
+## Criar uma pasta /modelos na raiz
+
 ## Adicionar uma venv com o comando:
 
 ``` python -m venv venvs ```
