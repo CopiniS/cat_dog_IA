@@ -11,7 +11,7 @@
 
 ## Adicionar as libs na venvs:
 
-``` venvs/Scripts/activate ```
+python``` venvs/Scripts/activate ```
 
 ``` pip install numpy ```
 
