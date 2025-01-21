@@ -7,15 +7,15 @@
 
 ## Adicionar uma venv com o comando:
 
-``` python -m venv venvs ```
+  python -m venv venvs
 
 ## Adicionar as libs na venvs:
 
-python``` venvs/Scripts/activate ```
+  venvs/Scripts/activate
 
-``` pip install numpy ```
+  pip install numpy
 
-``` pip install torch torchvision ```
+  pip install torch torchvision
 
 ## Configurar o arquivo config.json:
 - Adicione no vetor computers:
