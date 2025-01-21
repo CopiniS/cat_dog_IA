@@ -1,72 +1,55 @@
-import socket
+
+# client.py
 import json
+import socket
 import multiprocessing
+import time
 
-# Função para processar a tarefa
+# Configurações do cliente
+HOST = "127.0.0.1"
+PORT = 5000
+
+# Carregar configuração de núcleos
+with open("config.json", "r") as f:
+    config = json.load(f)
+NUM_CORES = config.get("cores", 4)
+
+# Função para processar uma tarefa
 def process_task(task):
-    # Simula processamento pesado
-    return f"Resultado para {task}"
+    print(f"[PROCESSANDO] {task}")
+    time.sleep(5)  # Simula processamento
+    result_file_content = f"Resultado da {task}"
+    result_file_name = f"result_{task}.txt"
+    return result_file_content, result_file_name
 
-# Função que processa múltiplas tarefas usando multiprocessing
-def worker_main(task_queue, result_queue):
-    while not task_queue.empty():
-        task = task_queue.get()
-        result = process_task(task)
-        result_queue.put(result)
+# Função principal do cliente
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+        client.connect((HOST, PORT))
+        print(f"[CONECTADO AO SERVIDOR] {HOST}:{PORT}")
 
-# Configuração do cliente
-def client_main():
-    with open("config.json", "r") as f:
-        config = json.load(f)
-
-    host = "127.0.0.1"  # Endereço do servidor
-    port = 5000         # Porta do servidor
-
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
-    print("Cliente conectado ao servidor")
-
-    try:
         while True:
-            # Receber uma tarefa do servidor
-            task = client_socket.recv(1024).decode('utf-8')
-            if not task:
+            try:
+                # Recebe tarefas
+                data = client.recv(4096)
+                tasks = json.loads(data.decode("utf-8"))
+
+                if not tasks:
+                    print("[NENHUMA TAREFA] Nenhuma tarefa recebida, aguardando...")
+                    time.sleep(5)
+                    continue
+
+                # Processa tarefas
+                with multiprocessing.Pool(NUM_CORES) as pool:
+                    results = pool.map(process_task, tasks)
+
+                # Envia resultados
+                result_data = {"success": True, "results": results}
+                client.sendall(json.dumps(result_data).encode("utf-8"))
+
+            except Exception as e:
+                print(f"[ERRO] {e}")
                 break
 
-            print(f"Tarefa recebida: {task}")
-
-            # Criar filas para o multiprocessing
-            task_queue = multiprocessing.Queue()
-            result_queue = multiprocessing.Queue()
-
-            # Adicionar a tarefa na fila
-            task_queue.put(task)
-
-            # Iniciar os processos
-            cores = config["computers"][0]["cores"]  # Exemplo: usar config para cores
-            processes = []
-            for _ in range(cores):
-                p = multiprocessing.Process(target=worker_main, args=(task_queue, result_queue))
-                p.start()
-                processes.append(p)
-
-            # Aguardar os processos terminarem
-            for p in processes:
-                p.join()
-
-            # Obter resultados
-            results = []
-            while not result_queue.empty():
-                results.append(result_queue.get())
-
-            # Enviar resultados ao servidor
-            result_message = ", ".join(results)
-            client_socket.send(result_message.encode('utf-8'))
-
-    except KeyboardInterrupt:
-        print("Cliente desconectado")
-    finally:
-        client_socket.close()
-
 if __name__ == "__main__":
-    client_main()
+    main()
