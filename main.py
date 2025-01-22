@@ -29,6 +29,7 @@ def read_images(data_transforms):
     return train_data, validation_data, test_data
 
 def fazTreinamento(parametros: str):
+    print('log faztreinamento')
     data_transforms = define_transforms(224,224)
     train_data, validation_data, test_data = read_images(data_transforms)
     cnn = CNN(train_data, validation_data, test_data,8)

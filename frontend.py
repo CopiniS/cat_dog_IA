@@ -8,9 +8,13 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 # Configurações do servidor
-HOST = "127.0.0.1"  # Endereço do servidor
-PORT = 5000          # Porta do servidor
-TIMEOUT = 20 * 60    # Timeout de 20 minutos
+with open("config.json", "r") as f:
+    config = json.load(f)
+NUM_CORES = config.get("cores", 4)
+
+HOST = config.get("frontend_ip", "127.0.0.1")  # Endereço do servidor
+PORT = config.get("frontend_port", 5000)          # Porta do servidor
+TIMEOUT = config.get("timeout_minutes", 20) * 60    # Timeout
 SAVE_DIR = "melhores_modelos"  # Diretório para salvar arquivos recebidos
 
 # Garante que o diretório existe
@@ -61,7 +65,7 @@ def handle_client(conn, addr):
                             #     with open(file_path, "w") as f:
                             #         f.write(file_content)
 
-                            print(f"Resultados: Acuracia media: {result.get("results", []).acc_media}  --  melhor modelo: {result.get("results", []).rep_max}")
+                            print(f"Resultados: Acuracia media: {result["results"]["acc_media"]}  --  path do melhor modelo no cliente: {result["results"]["file_path"]}")
 
                             clients[addr] = True
                         else:
@@ -84,11 +88,6 @@ def handle_client(conn, addr):
 
 # Função principal do servidor
 def main():
-    # Carregar tarefas para a fila
-    # tasks = [f"Task {i}" for i in range(1, 101)]
-    # for task in tasks:
-    #     task_queue.put(task)
-
     # Adicionando tarefas corretamente
     parametro = {
         "model_names": ["Alexnet"],

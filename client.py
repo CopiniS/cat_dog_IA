@@ -5,15 +5,16 @@ import socket
 import multiprocessing
 import time
 import main
+import os
 
-# Configurações do cliente
-HOST = "127.0.0.1"
-PORT = 5000
-
-# Carregar configuração de núcleos
+# Carregar configuração
 with open("config.json", "r") as f:
     config = json.load(f)
-NUM_CORES = config.get("cores", 4)
+
+# Configurações do cliente
+HOST = config.get("frontedn_ip", "127.0.0.1")
+PORT = config.get("frontend_port", 5000)
+NUM_CORES = config.get("cores", 1)
 
 # Função para processar uma tarefa
 def process_task(task):
@@ -26,8 +27,17 @@ def process_task(task):
     # result_file_name = f"result_{task}.txt"
     # return result_file_content, result_file_name
 
+    print('log 2')
+
+    file_path = f'/modelos/{task.model_names}_{task.epochs}_{task.learning_rates}_{task.weight_decays}_{rep_max}'
+
+    print('log 3')
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"O arquivo {file_path} não foi encontrado.")
+
     print (acc_media, rep_max)
-    return acc_media, rep_max
+    return {'acc_media': acc_media, 'file_path': file_path}
 
 # Função principal do cliente
 def run_client():
