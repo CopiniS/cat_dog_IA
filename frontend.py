@@ -56,10 +56,12 @@ def handle_client(conn, addr):
                             print(f"[SUCESSO] Cliente {addr} completou tarefas")
                             
                             # Salva arquivos enviados pelo cliente
-                            for file_content, file_name in result.get("results", []):
-                                file_path = os.path.join(SAVE_DIR, file_name)
-                                with open(file_path, "w") as f:
-                                    f.write(file_content)
+                            # for file_content, file_name in result.get("results", []):
+                            #     file_path = os.path.join(SAVE_DIR, file_name)
+                            #     with open(file_path, "w") as f:
+                            #         f.write(file_content)
+
+                            print(f"Resultados: Acuracia media: {result.get("results", []).acc_media}  --  melhor modelo: {result.get("results", []).rep_max}")
 
                             clients[addr] = True
                         else:

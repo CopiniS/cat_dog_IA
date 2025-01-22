@@ -28,6 +28,26 @@ def read_images(data_transforms):
     test_data = datasets.ImageFolder('./data/resumido/test/',transform=data_transforms['test'])
     return train_data, validation_data, test_data
 
+def fazTreinamento(parametros: str):
+    data_transforms = define_transforms(224,224)
+    train_data, validation_data, test_data = read_images(data_transforms)
+    cnn = CNN(train_data, validation_data, test_data,8)
+    replicacoes = 10
+
+    model_names= parametros.get("model_names")
+    epochs = parametros.get("epochs")
+    learning_rates = parametros.get("learning_rates")
+    weight_decays = parametros.get("weight_decays")
+
+    inicio = time.time()
+    acc_media, rep_max = cnn.create_and_train_cnn(model_names[0],epochs[0],learning_rates[0],weight_decays[0],replicacoes)
+    fim = time.time()
+    duracao = fim - inicio
+    print(f"{model_names[0]}-{epochs[0]}-{learning_rates[0]}-{weight_decays[0]}-Acurácia média: {acc_media} - Melhor replicação: {rep_max} - Tempo:{duracao}")
+
+    return acc_media, rep_max
+    
+
 if __name__ == '__main__':
     data_transforms = define_transforms(224,224)
     train_data, validation_data, test_data = read_images(data_transforms)

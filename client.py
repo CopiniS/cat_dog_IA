@@ -4,6 +4,7 @@ import json
 import socket
 import multiprocessing
 import time
+import main
 
 # Configurações do cliente
 HOST = "127.0.0.1"
@@ -17,13 +18,19 @@ NUM_CORES = config.get("cores", 4)
 # Função para processar uma tarefa
 def process_task(task):
     print(f"[PROCESSANDO] {task}")
-    time.sleep(5)  # Simula processamento
-    result_file_content = f"Resultado da {task}"
-    result_file_name = f"result_{task}.txt"
-    return result_file_content, result_file_name
+
+    #chama a funcao de treinamento do Wilson
+    acc_media, rep_max = main.fazTreinamento(task)
+
+    # result_file_content = f"Resultado da {task}"
+    # result_file_name = f"result_{task}.txt"
+    # return result_file_content, result_file_name
+
+    print (acc_media, rep_max)
+    return acc_media, rep_max
 
 # Função principal do cliente
-def main():
+def run_client():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.connect((HOST, PORT))
         print(f"[CONECTADO AO SERVIDOR] {HOST}:{PORT}")
@@ -45,6 +52,7 @@ def main():
 
                 # Envia resultados
                 result_data = {"success": True, "results": results}
+                print('result_data: ', result_data)
                 client.sendall(json.dumps(result_data).encode("utf-8"))
 
             except Exception as e:
@@ -52,4 +60,4 @@ def main():
                 break
 
 if __name__ == "__main__":
-    main()
+    run_client()
