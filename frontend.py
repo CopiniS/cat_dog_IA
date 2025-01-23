@@ -32,26 +32,27 @@ def handle_client(conn, addr):
     try:
         print(f"[CONEXÃO ESTABELECIDA] {addr}")
         while True:
+            print('log 1')
             with lock:
-                print('clients: ', clients)
                 if addr not in clients:
                     clients[addr] = True  # Cliente está disponível
-            print('clients[addr]: ', clients[addr])
             if clients[addr]:
+                print('log 2')
                 tasks = []
                 for _ in range(4):
                     try:
                         tasks.append(task_queue.get_nowait())
+                        print('task_queue: ', task_queue)
                     except queue.Empty:
+                        print('entra em fila vazia')
                         break
-                print('tasks: ', tasks)
                 if tasks:
                     # Envia tarefas para o cliente
                     conn.sendall(json.dumps(tasks).encode("utf-8"))
                     clients[addr] = False  # Marca cliente como ocupado
 
-                    # Recebe resultado
                     conn.settimeout(TIMEOUT)
+                    # Recebe resultado
                     try:
                         data = conn.recv(4096)
                         result = json.loads(data.decode("utf-8"))
@@ -59,25 +60,32 @@ def handle_client(conn, addr):
 
                         if result["success"]:
                             print(f"[SUCESSO] Cliente {addr} completou tarefas")
+                            print(f"Resultados: Acuracia media: {result['results'][0]['acc_media']} -- path do melhor modelo no cliente: {result['results'][0]['file_path']}")
                             
-                            # Salva arquivos enviados pelo cliente
-                            # for file_content, file_name in result.get("results", []):
-                            #     file_path = os.path.join(SAVE_DIR, file_name)
-                            #     with open(file_path, "w") as f:
-                            #         f.write(file_content)
+                            if task_queue.empty():
+                                tasksExists = False
 
-                            print(f"Resultados: Acuracia media: {result["results"][0]["acc_media"]}  --  path do melhor modelo no cliente: {result["results"][0]["file_path"]}")
-
-                            clients[addr] = True
                         else:
                             raise Exception("Erro no processamento pelo cliente")
 
-                    except (socket.timeout, Exception):
-                        print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
+                    except socket.timeout:
+                        print(f"[TIMEOUT] Cliente {addr} não respondeu dentro do tempo limite")
                         with lock:
                             for task in tasks:
                                 task_queue.put(task)
+
+                    except Exception as e:
+                        print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
+                        print(f"[DETALHES DO ERRO] {str(e)}")
+                        with lock:
+                            for task in tasks:
+                                task_queue.put(task)
+
+                    finally:
+                        # Marca o cliente como disponível novamente em ambos os casos
                         clients[addr] = True
+
+
 
     except ConnectionResetError:
         print(f"[DESCONECTADO] Cliente {addr} desconectado")

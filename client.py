@@ -29,8 +29,7 @@ def process_task(task):
 
     print('log 2')
 
-    file_path = f'/modelos/{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth'
-    file_path = os.path.join('modelos', f'{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth')
+    file_path = os.path.join('modelos', f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth")
 
     print('log 3')
 
