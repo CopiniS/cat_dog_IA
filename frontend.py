@@ -33,9 +33,10 @@ def handle_client(conn, addr):
         print(f"[CONEXÃO ESTABELECIDA] {addr}")
         while True:
             with lock:
+                print('clients: ', clients)
                 if addr not in clients:
                     clients[addr] = True  # Cliente está disponível
-
+            print('clients[addr]: ', clients[addr])
             if clients[addr]:
                 tasks = []
                 for _ in range(4):
@@ -43,7 +44,7 @@ def handle_client(conn, addr):
                         tasks.append(task_queue.get_nowait())
                     except queue.Empty:
                         break
-
+                print('tasks: ', tasks)
                 if tasks:
                     # Envia tarefas para o cliente
                     conn.sendall(json.dumps(tasks).encode("utf-8"))
@@ -65,7 +66,7 @@ def handle_client(conn, addr):
                             #     with open(file_path, "w") as f:
                             #         f.write(file_content)
 
-                            print(f"Resultados: Acuracia media: {result["results"]["acc_media"]}  --  path do melhor modelo no cliente: {result["results"]["file_path"]}")
+                            print(f"Resultados: Acuracia media: {result["results"][0]["acc_media"]}  --  path do melhor modelo no cliente: {result["results"][0]["file_path"]}")
 
                             clients[addr] = True
                         else:
@@ -97,13 +98,13 @@ def main():
     }
     task_queue.put(parametro)
 
-    parametro = {
-        "model_names": ["Alexnet"],
-        "epochs": [20],
-        "learning_rates": [0.001],
-        "weight_decays": [0],
-    }
-    task_queue.put(parametro)
+    # parametro = {
+    #     "model_names": ["Alexnet"],
+    #     "epochs": [20],
+    #     "learning_rates": [0.001],
+    #     "weight_decays": [0],
+    # }
+    # task_queue.put(parametro)
 
     # Inicialização do servidor
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:

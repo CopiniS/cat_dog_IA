@@ -2,8 +2,6 @@
   "cores": 4,
   "frontend_ip": "127.0.0.1",
   "fronteend_port": 5000,
-  "client_ip": "127.0.0.1",
-  "client_port": 5001,
   "timeout_minutes": 20
 }
 
