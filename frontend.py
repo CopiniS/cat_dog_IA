@@ -33,21 +33,24 @@ melhores_parametros = {}
 def handle_client(conn, addr):
     try:
         print(f"[CONEXÃO ESTABELECIDA] {addr}")
+        print(f"fila de tasks atual: {task_queue.queue}")
         while True:
             with lock:
                 if addr not in clients:
-                    clients[addr] = True  # Cliente está disponível
-            if clients[addr]:
+                    clients[addr] = {}
+                    clients[addr]["disponivel"] = True  # Cliente está disponível
+            if clients[addr]["disponivel"]:
                 tasks = []
                 for _ in range(4):
                     try:
                         tasks.append(task_queue.get_nowait())
                     except queue.Empty:
                         break
+                clients[addr]["tarefas"] = tasks #Cliente executará estas tasks
                 if tasks:
                     # Envia tarefas para o cliente
                     conn.sendall(json.dumps(tasks).encode("utf-8"))
-                    clients[addr] = False  # Marca cliente como ocupado
+                    clients[addr]["disponivel"] = False  # Marca cliente como ocupado
 
                     conn.settimeout(TIMEOUT)
                     # Recebe resultado
@@ -74,15 +77,12 @@ def handle_client(conn, addr):
 
                         else:
                             print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
-
-                            print(f"[SUCESSO] Cliente {addr} completou tarefas")
-                            print(f"Resultados: Acuracia media: {result['results'][0]['acc_media']} -- path do melhor modelo no cliente: {result['results'][0]['file_path']}")
-                            
-                            if task_queue.empty():
-                                tasksExists = False
+                            with lock:
+                                for task in tasks:
+                                    task_queue.put(task)
 
                     except socket.timeout:
-                        print(f"[TIMEOUT] Cliente {addr} não respondeu dentro do tempo limite")
+                        print(f"[TIMEOUT] Cliente {addr} não respondeu dentro do tempo limite, retornando para a fila")
                         with lock:
                             for task in tasks:
                                 task_queue.put(task)
@@ -96,17 +96,26 @@ def handle_client(conn, addr):
 
                     finally:
                         # Marca o cliente como disponível novamente em ambos os casos
-                        clients[addr] = True
-
-
+                        clients[addr]["disponivel"] = True
 
     except ConnectionResetError:
         print(f"[DESCONECTADO] Cliente {addr} desconectado")
+        #talvez adicionar uma verificação para ver se essas tasks ja nao estao na fila seja necessario
+
+        #retornando as tasks para a fila
+        tasks = clients[addr]["tarefas"]
+
+        with lock:
+            for task in tasks:
+                task_queue.put(task)
+
     finally:
         conn.close()
+        #retirando o cliente na lista de cliente
         with lock:
             if addr in clients:
                 del clients[addr]
+        
 
 def config_queue():
     if 'fila_task' not in config or not config['fila_task']:
