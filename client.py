@@ -37,8 +37,24 @@ def process_task(task):
 
     return {'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name}
 
+def verifica_modelos_dir(diretorio: str):
+    if os.path.exists(diretorio):
+    # Remove todos os arquivos dentro do diretório
+        for arquivo in os.listdir(diretorio):
+            caminho_arquivo = os.path.join(diretorio, arquivo)
+            try:
+                if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
+                    os.unlink(caminho_arquivo)  # Apaga arquivos e links simbólicos
+            except Exception as e:
+                print(f"Erro ao apagar {caminho_arquivo}: {e}")
+    else:
+        # Cria o diretório se ele não existir
+        os.makedirs(diretorio)
+        print(f"Diretório modelos criado com sucesso.")
+
 # Função principal do cliente
 def run_client():
+    verifica_modelos_dir('modelos')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.connect((HOST, PORT))
         print(f"[CONECTADO AO SERVIDOR] {HOST}:{PORT}")
@@ -80,14 +96,10 @@ def run_client():
 
                     # Enviar o arquivo em pedaços de 4KB
                     with open(result_data["results"]["file_path"], 'rb') as file:
-                        print('log 1')
                         while chunk := file.read(4096):  # 4 KB chunks
-                            print('log 2')
                             client.sendall(chunk)
-                            print('log 3')
                             # Esperar pela confirmação do servidor
                             response = client.recv(2)
-                            print('log 4')
                             if response != b'OK':
                                 print("Erro na transmissão. Tentando novamente...")
                                 break

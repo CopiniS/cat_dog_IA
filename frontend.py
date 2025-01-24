@@ -144,11 +144,26 @@ def config_queue():
     for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
         task_queue.put(tarefa)
 
+def verifica_modelos_dir(diretorio: str):
+    if os.path.exists(diretorio):
+    # Remove todos os arquivos dentro do diretório
+        for arquivo in os.listdir(diretorio):
+            caminho_arquivo = os.path.join(diretorio, arquivo)
+            try:
+                if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
+                    os.unlink(caminho_arquivo)  # Apaga arquivos e links simbólicos
+            except Exception as e:
+                print(f"Erro ao apagar {caminho_arquivo}: {e}")
+    else:
+        # Cria o diretório se ele não existir
+        os.makedirs(diretorio)
+        print(f"Diretório modelos criado com sucesso.")
 
 # Função principal do servidor
 def main():
     # Adicionando tarefas a queue
     config_queue()
+    verifica_modelos_dir('melhores_modelos')
 
     # Inicialização do servidor
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
