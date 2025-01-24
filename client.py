@@ -12,9 +12,9 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 # Configurações do cliente
-HOST = config.get("frontedn_ip", "127.0.0.1")
-PORT = config.get("frontend_port", 5000)
-NUM_CORES = config.get("cores", 1)
+HOST = config['frontend_ip']
+PORT = config['frontend_port']
+NUM_CORES = config['cores']
 
 # Função para processar uma tarefa
 def process_task(task):
@@ -27,16 +27,12 @@ def process_task(task):
     # result_file_name = f"result_{task}.txt"
     # return result_file_content, result_file_name
 
-    print('log 2')
 
     file_path = os.path.join('modelos', f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth")
-
-    print('log 3')
 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"O arquivo {file_path} não foi encontrado.")
 
-    print (acc_media, rep_max)
     return {'acc_media': acc_media, 'file_path': file_path}
 
 # Função principal do cliente

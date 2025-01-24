@@ -5,16 +5,17 @@ import socket
 import threading
 import time
 import os
+from itertools import product
 from concurrent.futures import ThreadPoolExecutor
 
 # Configurações do servidor
 with open("config.json", "r") as f:
     config = json.load(f)
-NUM_CORES = config.get("cores", 4)
+NUM_CORES = config['cores']
 
-HOST = config.get("frontend_ip", "127.0.0.1")  # Endereço do servidor
-PORT = config.get("frontend_port", 5000)          # Porta do servidor
-TIMEOUT = config.get("timeout_minutes", 20) * 60    # Timeout
+HOST = config['frontend_ip'] # Endereço do servidor
+PORT = config['frontend_port']        # Porta do servidor
+TIMEOUT = config["timeout_minutes"] * 60    # Timeout
 SAVE_DIR = "melhores_modelos"  # Diretório para salvar arquivos recebidos
 
 # Garante que o diretório existe
@@ -52,7 +53,6 @@ def handle_client(conn, addr):
                     try:
                         data = conn.recv(4096)
                         result = json.loads(data.decode("utf-8"))
-                        print('result: ', result)
 
                         if result["success"]:
                             print(f"[SUCESSO] Cliente {addr} completou tarefas")
@@ -91,48 +91,47 @@ def handle_client(conn, addr):
             if addr in clients:
                 del clients[addr]
 
+def config_queue():
+    if 'fila_task' not in config or not config['fila_task']:
+        # Parâmetros para gerar combinações
+        modelos = ["alexnet", "mobilenet_v3_large", "mobilenet_v3_small", "resnet18", "resnet101", "vgg11", "vgg19"]
+        epocas = [10, 20]
+        learning_rates = [0.001, 0.0001, 0.00001]
+        weight_decays = [0, 0.0001]
+
+        # Gera todas as combinações possíveis
+        combinacoes = product(modelos, epocas, learning_rates, weight_decays)
+
+        # adiciona as combinações a fila
+        for combinacao in combinacoes:
+            tarefa = {
+                "model_names": [combinacao[0]],
+                "epochs": [combinacao[1]],
+                "learning_rates": [combinacao[2]],
+                "weight_decays": [combinacao[3]]
+            }
+            task_queue.put(tarefa)
+
+        # Salva as combinações no arquivo de configuração
+        config['fila_task'] = list(task_queue.queue)  # Converte a fila para uma lista antes de salvar
+        with open('config.json', 'w') as file:
+            json.dump(config, file, indent=4)
+        print("Fila gerada e salva no arquivo de configuração.")
+
+    else:
+        print("A fila já existe no arquivo de configuração. Carregando...")
+
+    # Exemplo de como acessar a fila a partir do arquivo de configuração
+    max_tasks = config.get('max_tasks', len(config['fila_task']))  # Limite de tarefas na fila
+
+    for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
+        task_queue.put(tarefa)
+
+
 # Função principal do servidor
 def main():
-    # Adicionando tarefas corretamente
-    parametro = {
-        "model_names": ["Alexnet"],
-        "epochs": [10],
-        "learning_rates": [0.001],
-        "weight_decays": [0],
-    }
-    task_queue.put(parametro)
-
-    parametro = {
-        "model_names": ["Alexnet"],
-        "epochs": [20],
-        "learning_rates": [0.0001],
-        "weight_decays": [0],
-    }
-    task_queue.put(parametro)
-
-    parametro = {
-        "model_names": ["Alexnet"],
-        "epochs": [10],
-        "learning_rates": [0.001],
-        "weight_decays": [0.0001],
-    }
-    task_queue.put(parametro)
-
-    parametro = {
-        "model_names": ["Alexnet"],
-        "epochs": [20],
-        "learning_rates": [0.0001],
-        "weight_decays": [0],
-    }
-    task_queue.put(parametro)
-
-    parametro = {
-        "model_names": ["Alexnet"],
-        "epochs": [20],
-        "learning_rates": [0.001],
-        "weight_decays": [0.0001],
-    }
-    task_queue.put(parametro)
+    # Adicionando tarefas a queue
+    config_queue()
 
     # Inicialização do servidor
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:

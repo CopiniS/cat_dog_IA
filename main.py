@@ -29,7 +29,6 @@ def read_images(data_transforms):
     return train_data, validation_data, test_data
 
 def fazTreinamento(parametros: str):
-    print('log faztreinamento')
     data_transforms = define_transforms(224,224)
     train_data, validation_data, test_data = read_images(data_transforms)
     cnn = CNN(train_data, validation_data, test_data,8)
@@ -39,6 +38,7 @@ def fazTreinamento(parametros: str):
     epochs = parametros.get("epochs")
     learning_rates = parametros.get("learning_rates")
     weight_decays = parametros.get("weight_decays")
+
 
     inicio = time.time()
     acc_media, rep_max = cnn.create_and_train_cnn(model_names[0],epochs[0],learning_rates[0],weight_decays[0],replicacoes)
