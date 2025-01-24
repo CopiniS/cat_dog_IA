@@ -4,6 +4,7 @@ import torch
 from torchvision import datasets
 from torchvision.transforms import v2
 import time
+import json
 
 
 def define_transforms(height, width):
@@ -29,10 +30,13 @@ def read_images(data_transforms):
     return train_data, validation_data, test_data
 
 def fazTreinamento(parametros: str):
+    with open("config.json", "r") as f:
+        config = json.load(f)
+
     data_transforms = define_transforms(224,224)
     train_data, validation_data, test_data = read_images(data_transforms)
     cnn = CNN(train_data, validation_data, test_data,8)
-    replicacoes = 3
+    replicacoes = config['replicacoes']
 
     model_names= parametros.get("model_names")
     epochs = parametros.get("epochs")

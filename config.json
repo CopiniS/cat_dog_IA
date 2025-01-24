@@ -3,7 +3,8 @@
     "frontend_ip": "127.0.0.1",
     "frontend_port": 5000,
     "timeout_minutes": 20,
-    "max_tasks": 5,
+    "replicacoes": 2,
+    "max_tasks": 2,
     "fila_task": [
         {
             "model_names": [

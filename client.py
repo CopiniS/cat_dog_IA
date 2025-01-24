@@ -29,11 +29,13 @@ def process_task(task):
 
 
     file_path = os.path.join('modelos', f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth")
+    file_name = f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth"
 
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"O arquivo {file_path} não foi encontrado.")
+        print(f"O arquivo {file_path} não foi encontrado.")
+        return None
 
-    return {'acc_media': acc_media, 'file_path': file_path}
+    return {'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name}
 
 # Função principal do cliente
 def run_client():
@@ -57,9 +59,42 @@ def run_client():
                     results = pool.map(process_task, tasks)
 
                 # Envia resultados
-                result_data = {"success": True, "results": results}
+                if not results:
+                    result_data = {"success": False}
+                    client.sendall(json.dumps(result_data).encode("utf-8"))
+
+                #Verifica a melhor task, entre as que executaram em paralelo
+                melhor_task = None
+                maior_acc_media = 0
+                for result in results:
+                    if result["acc_media"] > maior_acc_media:
+                        melhor_task = result
+                        maior_acc_media = result["acc_media"]
+
+                result_data = {"success": True, "results": melhor_task}
                 print('result_data: ', result_data)
                 client.sendall(json.dumps(result_data).encode("utf-8"))
+
+                if result_data['success']:
+                    print("Treinamento realizado com sucesso. Enviando o arquivo pth...")
+
+                    # Enviar o arquivo em pedaços de 4KB
+                    with open(result_data["results"]["file_path"], 'rb') as file:
+                        print('log 1')
+                        while chunk := file.read(4096):  # 4 KB chunks
+                            print('log 2')
+                            client.sendall(chunk)
+                            print('log 3')
+                            # Esperar pela confirmação do servidor
+                            response = client.recv(2)
+                            print('log 4')
+                            if response != b'OK':
+                                print("Erro na transmissão. Tentando novamente...")
+                                break
+                    
+                    print("Arquivo enviado com sucesso")
+                else:
+                    print("falha no treinamento. Nenhum arquivo será enviado.")
 
             except Exception as e:
                 print(f"[ERRO] {e}")

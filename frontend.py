@@ -27,6 +27,7 @@ task_queue = queue.Queue()
 # Clientes conectados
 clients = {}
 lock = threading.Lock()
+melhores_parametros = {}
 
 # Função para lidar com clientes
 def handle_client(conn, addr):
@@ -56,13 +57,29 @@ def handle_client(conn, addr):
 
                         if result["success"]:
                             print(f"[SUCESSO] Cliente {addr} completou tarefas")
+                            print('Arquivo .pth será enviado')
+
+                            save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
+
+                            # Receber o arquivo
+                            with open(save_path, 'wb') as file:
+                                while True:
+                                    file_data = conn.recv(4096)  # 4 KB chunks
+                                    if not file_data:
+                                        break
+                                    file.write(file_data)
+                                    conn.sendall(b'OK')  # Confirm receiving chunk
+
+                            print(f"Arquivo salvo como {save_path}")
+
+                        else:
+                            print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
+
+                            print(f"[SUCESSO] Cliente {addr} completou tarefas")
                             print(f"Resultados: Acuracia media: {result['results'][0]['acc_media']} -- path do melhor modelo no cliente: {result['results'][0]['file_path']}")
                             
                             if task_queue.empty():
                                 tasksExists = False
-
-                        else:
-                            raise Exception("Erro no processamento pelo cliente")
 
                     except socket.timeout:
                         print(f"[TIMEOUT] Cliente {addr} não respondeu dentro do tempo limite")
