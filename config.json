@@ -1,6 +1,6 @@
 {
   "cores": 4,
-  "frontend_ip": "127.0.0.1",
+  "frontend_ip": "10.1.1.108",
   "fronteend_port": 5000,
   "timeout_minutes": 20
 }

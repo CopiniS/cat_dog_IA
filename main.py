@@ -33,7 +33,7 @@ def fazTreinamento(parametros: str):
     data_transforms = define_transforms(224,224)
     train_data, validation_data, test_data = read_images(data_transforms)
     cnn = CNN(train_data, validation_data, test_data,8)
-    replicacoes = 10
+    replicacoes = 3
 
     model_names= parametros.get("model_names")
     epochs = parametros.get("epochs")
