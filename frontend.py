@@ -7,6 +7,7 @@ import time
 import os
 from itertools import product
 from concurrent.futures import ThreadPoolExecutor
+import time
 
 # Configurações do servidor
 with open("config.json", "r") as f:
@@ -24,15 +25,25 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 # Fila de tarefas compartilhada
 task_queue = queue.Queue()
 
+start_time = None
+end_time = None
+
 # Clientes conectados
 clients = {}
 lock = threading.Lock()
-melhores_parametros = {}
+melhroes_tasks = []
 
 # Função para lidar com clientes
 def handle_client(conn, addr):
+    global start_time
     try:
         print(f"[CONEXÃO ESTABELECIDA] {addr}")
+
+        # Inicia o timer no primeiro cliente
+        if start_time is None:
+            start_time = time.time()
+            print("Iniciando o timer!")
+
         print(f"fila de tasks atual: {task_queue.queue}")
         while True:
             with lock:
@@ -64,16 +75,28 @@ def handle_client(conn, addr):
 
                             save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
 
+                            print('log 1')
+
                             # Receber o arquivo
                             with open(save_path, 'wb') as file:
+                                print('log 2')
                                 while True:
+                                    print('log 3')
                                     file_data = conn.recv(4096)  # 4 KB chunks
+                                    print('log 4')
                                     if not file_data:
+                                        print('log 5')
                                         break
+                                    print('log 6')
                                     file.write(file_data)
+                                    print('log 7')
                                     conn.sendall(b'OK')  # Confirm receiving chunk
+                                    print('log 8')
 
                             print(f"Arquivo salvo como {save_path}")
+                            acc_media = result["results"]["acc_media"]
+                            
+                            melhroes_tasks.push({"acc_media": acc_media, "save_path": save_path})
 
                         else:
                             print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
@@ -95,6 +118,7 @@ def handle_client(conn, addr):
                                 task_queue.put(task)
 
                     finally:
+                        print('entra aqui no finaly')
                         # Marca o cliente como disponível novamente em ambos os casos
                         clients[addr]["disponivel"] = True
 
@@ -168,6 +192,29 @@ def verifica_modelos_dir(diretorio: str):
         os.makedirs(diretorio)
         print(f"Diretório modelos criado com sucesso.")
 
+def should_stop_server():
+    with lock:
+        # Verifica se a fila está vazia e todos os clientes estão disponíveis
+        all_disponiveis = all(clients[addr]["disponivel"] for addr in clients)
+        if task_queue.empty() and (all_disponiveis or not clients):
+            return True
+    return False
+
+def exibir_resultados():
+    global end_time
+    # Encontrando o objeto com o maior valor em acc_media
+    melhor_task = max(melhroes_tasks, key=lambda x: x["acc_media"])
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    print(f"O melhor modelo treinado é o arquivo { melhor_task.save_path }")
+    print(f"Acurácia média de { melhor_task.acc_media }")
+    print(f"Tempo de execução de { execution_time }")
+
+    
+
+
 # Função principal do servidor
 def main():
     # Adicionando tarefas a queue
@@ -182,8 +229,20 @@ def main():
 
         with ThreadPoolExecutor() as executor:
             while True:
-                conn, addr = server.accept()
-                executor.submit(handle_client, conn, addr)
+
+                if should_stop_server():
+                    print("[FINALIZANDO] Todas as tarefas foram concluídas e todos os clientes estão disponíveis.")
+                    break
+
+                # Aceita novas conexões
+                try:
+                    server.settimeout(1)  # Timeout curto para verificar condições periodicamente
+                    conn, addr = server.accept()
+                    executor.submit(handle_client, conn, addr)
+                except socket.timeout:
+                    pass  # Permite verificar novamente as condições para encerrar
+
+    exibir_resultados()
 
 if __name__ == "__main__":
     main()
