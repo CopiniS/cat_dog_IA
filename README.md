@@ -1,19 +1,23 @@
 # Como Rodar:
 
 ## Instalar o python:
-- vai na microsoft store e baixa o python, eu instalei o 3.12
+1- vai na microsoft store e baixa o python, eu instalei o 3.12
 
 ## Clona o repositório
 
-- Faz o git clone do repositorio:
+2- Faz o git clone do repositorio:
 
   git clone https://github.com/CopiniS/cat_dog_IA.git
 
-## Na raiz do projeto adicionar uma venv com o comando:
+## Adicionar uma venv:
+
+3- Na raiz do projeto utilizar o comando:
 
   python -m venv venvs
 
-## Adicionar as libs na venvs:
+## Adicionar as libs na venvs
+
+4- Usar os comandos:
 
   venvs/Scripts/activate
 
@@ -22,6 +26,9 @@
   pip install torch torchvision
 
 ## Configurar o arquivo config.json:
+
+5- O que cada atributo faz:
+
 - cores: a quantidade de tasks que será enviado pra cada cliente por vez. Que será também a quantidade de processos criados pelo cliente.
 - frontend_ip e frontend_port: o ip e a porta em que vai rodar o servidor na rede 
 - timeout_minutes: o tempo que o servidor aguarda o retorno dos dados pelo cliente, em minutos. Se ultrapassar ele vai retornar as tasks pra fila
@@ -31,11 +38,11 @@
 
 ## Rodar
 
-- Rodar o servidor 'frontend.py':
+6- Rodar o servidor 'frontend.py':
 
   python frontend.py
 
-- Rode quantos clientes 'cleint.py' quiser, em quantas máquinas quiser, que o servidor vai separando as tasks para os mesmos:
+7- Rode quantos clientes 'cleint.py' quiser, em quantas máquinas quiser, que o servidor vai separando as tasks para os mesmos:
 
   venvs/Scripts/activate
 
