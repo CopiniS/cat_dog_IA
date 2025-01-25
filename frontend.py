@@ -8,6 +8,7 @@ import os
 from itertools import product
 from concurrent.futures import ThreadPoolExecutor
 import time
+from datetime import timedelta
 
 # Configurações do servidor
 with open("config.json", "r") as f:
@@ -44,7 +45,6 @@ def handle_client(conn, addr):
             start_time = time.time()
             print("Iniciando o timer!")
 
-        print(f"fila de tasks atual: {task_queue.queue}")
         while True:
             with lock:
                 if addr not in clients:
@@ -74,29 +74,25 @@ def handle_client(conn, addr):
                             print('Arquivo .pth será enviado')
 
                             save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
-
-                            print('log 1')
+                            file_size = int(result["results"]["file_size"])  # Novo campo vindo do cliente
+                            received_data = 0
 
                             # Receber o arquivo
                             with open(save_path, 'wb') as file:
-                                print('log 2')
-                                while True:
-                                    print('log 3')
+                                while received_data < file_size:
                                     file_data = conn.recv(4096)  # 4 KB chunks
-                                    print('log 4')
                                     if not file_data:
-                                        print('log 5')
                                         break
-                                    print('log 6')
                                     file.write(file_data)
-                                    print('log 7')
-                                    conn.sendall(b'OK')  # Confirm receiving chunk
-                                    print('log 8')
+                                    received_data += len(file_data)  # Incrementa o total recebido
+                                    conn.sendall(b'OK')  # Confirmação de recebimento
 
-                            print(f"Arquivo salvo como {save_path}")
-                            acc_media = result["results"]["acc_media"]
-                            
-                            melhroes_tasks.push({"acc_media": acc_media, "save_path": save_path})
+                            if received_data == file_size:
+                                print(f"Arquivo salvo como {save_path}")
+                                acc_media = result["results"]["acc_media"]
+                                melhroes_tasks.append({"acc_media": acc_media, "save_path": save_path})
+                            else:
+                                print(f"[ERRO] Dados incompletos. Recebido: {received_data} bytes, esperado: {file_size} bytes")
 
                         else:
                             print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
@@ -118,7 +114,6 @@ def handle_client(conn, addr):
                                 task_queue.put(task)
 
                     finally:
-                        print('entra aqui no finaly')
                         # Marca o cliente como disponível novamente em ambos os casos
                         clients[addr]["disponivel"] = True
 
@@ -207,10 +202,11 @@ def exibir_resultados():
 
     end_time = time.time()
     execution_time = end_time - start_time
+    formatted_time = str(timedelta(seconds=int(execution_time)))
 
-    print(f"O melhor modelo treinado é o arquivo { melhor_task.save_path }")
-    print(f"Acurácia média de { melhor_task.acc_media }")
-    print(f"Tempo de execução de { execution_time }")
+    print(f"O melhor modelo treinado é o arquivo { melhor_task['save_path'] }")
+    print(f"Acurácia média de { melhor_task['acc_media'] }")
+    print(f"Tempo de execução de { formatted_time }")
 
     
 
@@ -232,6 +228,7 @@ def main():
 
                 if should_stop_server():
                     print("[FINALIZANDO] Todas as tarefas foram concluídas e todos os clientes estão disponíveis.")
+                    exibir_resultados()
                     break
 
                 # Aceita novas conexões
@@ -241,8 +238,7 @@ def main():
                     executor.submit(handle_client, conn, addr)
                 except socket.timeout:
                     pass  # Permite verificar novamente as condições para encerrar
-
-    exibir_resultados()
+    print('END')
 
 if __name__ == "__main__":
     main()

@@ -30,12 +30,13 @@ def process_task(task):
 
     file_path = os.path.join('modelos', f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth")
     file_name = f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth"
+    file_size = os.path.getsize(file_path)
 
     if not os.path.exists(file_path):
         print(f"O arquivo {file_path} não foi encontrado.")
         return None
 
-    return {'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name}
+    return {'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name, 'file_size': file_size}
 
 def verifica_modelos_dir(diretorio: str):
     if os.path.exists(diretorio):
