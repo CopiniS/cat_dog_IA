@@ -9,6 +9,7 @@
 
   ```bash
   git clone https://github.com/CopiniS/cat_dog_IA.git
+  ```
 
 ## Adicionar uma venv:
 
@@ -16,6 +17,7 @@
 
   ```bash
   python -m venv venvs
+  ```
 
 ## Adicionar as libs na venvs
 
@@ -23,12 +25,15 @@
 
   ```bash
   venvs/Scripts/activate
+  ```
 
   ```bash
   pip install numpy
+  ```
 
   ```bash
   pip install torch torchvision
+  ```
 
 ## Configurar o arquivo config.json:
 
@@ -47,12 +52,14 @@
 
   ```bash
   python frontend.py
+  ```
 
 7- Rode quantos clientes 'cleint.py' quiser, em quantas máquinas quiser, que o servidor vai separando as tasks para os mesmos:
 
   ```bash
   venvs/Scripts/activate
+  ```
 
   ```bash
   python client.py
-
+  ```
