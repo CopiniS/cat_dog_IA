@@ -43,7 +43,7 @@ def handle_client(conn, addr):
         # Inicia o timer no primeiro cliente
         if start_time is None:
             start_time = time.time()
-            print("Iniciando o timer!")
+            print("[INICIANDO O TIMER]")
 
         while True:
             with lock:
@@ -60,7 +60,8 @@ def handle_client(conn, addr):
                 clients[addr]["tarefas"] = tasks #Cliente executará estas tasks
                 if tasks:
                     # Envia tarefas para o cliente
-                    conn.sendall(json.dumps(tasks).encode("utf-8"))
+                    json_data = json.dumps(tasks)
+                    conn.sendall(json_data.encode("utf-8"))
                     clients[addr]["disponivel"] = False  # Marca cliente como ocupado
 
                     conn.settimeout(TIMEOUT)
@@ -86,9 +87,8 @@ def handle_client(conn, addr):
                                     file.write(file_data)
                                     received_data += len(file_data)  # Incrementa o total recebido
                                     conn.sendall(b'OK')  # Confirmação de recebimento
-
                             if received_data == file_size:
-                                print(f"Arquivo salvo como {save_path}")
+                                print(f"[SUCESSO]: Arquivo salvo como {save_path}")
                                 acc_media = result["results"]["acc_media"]
                                 melhroes_tasks.append({"acc_media": acc_media, "save_path": save_path})
                             else:
@@ -181,7 +181,7 @@ def verifica_modelos_dir(diretorio: str):
                 if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
                     os.unlink(caminho_arquivo)  # Apaga arquivos e links simbólicos
             except Exception as e:
-                print(f"Erro ao apagar {caminho_arquivo}: {e}")
+                print(f"[ERRO]: Erro ao apagar {caminho_arquivo}: {e}")
     else:
         # Cria o diretório se ele não existir
         os.makedirs(diretorio)
@@ -198,14 +198,17 @@ def should_stop_server():
 def exibir_resultados():
     global end_time
     # Encontrando o objeto com o maior valor em acc_media
-    melhor_task = max(melhroes_tasks, key=lambda x: x["acc_media"])
+    if melhroes_tasks:
+        melhor_task = max(melhroes_tasks, key=lambda x: x["acc_media"])
 
-    end_time = time.time()
-    execution_time = end_time - start_time
-    formatted_time = str(timedelta(seconds=int(execution_time)))
-
-    print(f"O melhor modelo treinado é o arquivo { melhor_task['save_path'] }")
-    print(f"Acurácia média de { melhor_task['acc_media'] }")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        formatted_time = str(timedelta(seconds=int(execution_time)))
+        print('[RESULTADOS]')
+        print(f"O melhor modelo treinado é o arquivo { melhor_task['save_path'] }")
+        print(f"Acurácia média de { melhor_task['acc_media'] }")
+    else:
+        print('[ERRO]: não conseguiu receber o melhor modelo')
     print(f"Tempo de execução de { formatted_time }")
 
     
