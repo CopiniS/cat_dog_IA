@@ -1,3 +1,4 @@
+
 # client.py
 import json
 import socket
@@ -27,12 +28,12 @@ def process_task(task):
     # return result_file_content, result_file_name
 
 
-    file_path = os.path.join('modelos', f"{task['model_names'][0]}{task['epochs'][0]}{task['learning_rates'][0]}{task['weight_decays'][0]}{rep_max}.pth")
-    file_name = f"{task['model_names'][0]}{task['epochs'][0]}{task['learning_rates'][0]}{task['weight_decays'][0]}{rep_max}.pth"
+    file_path = os.path.join('modelos', f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth")
+    file_name = f"{task['model_names'][0]}_{task['epochs'][0]}_{task['learning_rates'][0]}_{task['weight_decays'][0]}_{rep_max}.pth"
     file_size = os.path.getsize(file_path)
 
     if not os.path.exists(file_path):
-        print(f"O arquivo {file_path} não foi encontrado.")
+        print(f"[ERRO]: O arquivo {file_path} não foi encontrado.")
         return None
 
     return {'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name, 'file_size': file_size}
@@ -46,11 +47,11 @@ def verifica_modelos_dir(diretorio: str):
                 if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
                     os.unlink(caminho_arquivo)  # Apaga arquivos e links simbólicos
             except Exception as e:
-                print(f"Erro ao apagar {caminho_arquivo}: {e}")
+                print(f"[ERRO]: Erro ao apagar {caminho_arquivo}: {e}")
     else:
         # Cria o diretório se ele não existir
         os.makedirs(diretorio)
-        print(f"Diretório modelos criado com sucesso.")
+        print(f"[DIRETORIO CRIADO]: Diretório modelos criado com sucesso.")
 
 # Função principal do cliente
 def run_client():
@@ -64,14 +65,13 @@ def run_client():
                 # Recebe tarefas
                 data = client.recv(4096)
                 tasks = []
-                # O try é porque o data pode vir como b'OKOKKOKOKOK'
+                # O try é porque o data pode vir como b'OKOKKOKOKOK
                 try:
                     tasks = json.loads(data.decode('utf-8'))  # Tenta converter para JSON
-                    print("[TASKS RECEBIDAS]:", tasks)  # Sucesso, pode processar
-                    print("[INICIANDO PROCESSAMENTO]")  # Sucesso, pode processar
+                    print("[Tasks recebidas com sucesso]. Iniciando Processamento:", tasks)  # Sucesso, pode processar
 
                 except json.JSONDecodeError:
-                    print("[AGUARDANDO TASKS]...")
+                    print("[Esperando Tasks]...")
 
                 if not tasks:
                     print("[NENHUMA TAREFA] Nenhuma tarefa recebida, aguardando...")
@@ -101,7 +101,7 @@ def run_client():
                 client.sendall(json_data.encode("utf-8"))
 
                 if result_data['success']:
-                    print("[SUCESSO NO TREINAMENTO]: Treinamento realizado com sucesso. Enviando o arquivo pth...")
+                    print("[SUCESSO NO TRINAMENTO]: Treinamento realizado com sucesso. Enviando o arquivo pth...")
 
                     # Enviar o arquivo em pedaços de 4KB
                     with open(result_data["results"]["file_path"], 'rb') as file:
@@ -114,10 +114,10 @@ def run_client():
                                 if response == b'OK':
                                     break
                                 tentativas += 1
-                                print(f"[ERRO]: falha na transmissão. Tentativa {tentativas}/5...")
+                                print(f"[ERRO]: Erro na transmissão. Tentativa {tentativas}/5...")
                                 
                             if tentativas == 5:  # Se falhar 5 vezes, lança uma exceção
-                                raise Exception("[ERRO]: Falha na transmissão do arquivo.")
+                                raise Exception("Falha na transmissão do arquivo.")
 
                     print("[SUCESSO]: Arquivo enviado com sucesso")
                 else:
