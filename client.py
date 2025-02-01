@@ -127,5 +127,5 @@ def run_client():
                 print(f"[ERRO] {e}")
                 break
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     run_client()
