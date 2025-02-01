@@ -1,10 +1,11 @@
 {
     "cores": 4,
-    "frontend_ip": "10.1.1.104",
+    "frontend_ip": "10.1.1.108",
     "frontend_port": 5000,
     "timeout_minutes": 20,
     "replicacoes": 2,
-    "max_tasks": 2,
+    "max_tasks": 15,
+    "quant_tasks": 4,
     "fila_task": [
         {
             "model_names": [

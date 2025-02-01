@@ -13,7 +13,7 @@ from datetime import timedelta
 # Configurações do servidor
 with open("config.json", "r") as f:
     config = json.load(f)
-NUM_CORES = config['cores']
+QUANT_TASKS = config['quant_tasks']
 
 HOST = config['frontend_ip'] # Endereço do servidor
 PORT = config['frontend_port']        # Porta do servidor
@@ -52,13 +52,14 @@ def handle_client(conn, addr):
                     clients[addr]["disponivel"] = True  # Cliente está disponível
             if clients[addr]["disponivel"]:
                 tasks = []
-                for _ in range(4):
+                for _ in range(QUANT_TASKS):
                     try:
                         tasks.append(task_queue.get_nowait())
                     except queue.Empty:
                         break
                 clients[addr]["tarefas"] = tasks #Cliente executará estas tasks
                 if tasks:
+                    print(f"[ENVIANDO TAKS]: {tasks}")
                     # Envia tarefas para o cliente
                     json_data = json.dumps(tasks)
                     conn.sendall(json_data.encode("utf-8"))
@@ -86,7 +87,7 @@ def handle_client(conn, addr):
                                         break
                                     file.write(file_data)
                                     received_data += len(file_data)  # Incrementa o total recebido
-                                    conn.sendall(b'OK')  # Confirmação de recebimento
+                                    # conn.sendall(b'OK')  # Confirmação de recebimento
                             if received_data == file_size:
                                 print(f"[SUCESSO]: Arquivo salvo como {save_path}")
                                 acc_media = result["results"]["acc_media"]
@@ -116,6 +117,8 @@ def handle_client(conn, addr):
                     finally:
                         # Marca o cliente como disponível novamente em ambos os casos
                         clients[addr]["disponivel"] = True
+                else:
+                    break
 
     except ConnectionResetError:
         print(f"[DESCONECTADO] Cliente {addr} desconectado")

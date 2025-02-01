@@ -106,18 +106,7 @@ def run_client():
                     # Enviar o arquivo em pedaços de 4KB
                     with open(result_data["results"]["file_path"], 'rb') as file:
                         while chunk := file.read(4096):  # 4 KB chunks
-                            tentativas = 0
-                            while tentativas < 6:
-                                client.sendall(chunk)
-                                # Esperar pela confirmação do servidor
-                                response = client.recv(2)
-                                if response == b'OK':
-                                    break
-                                tentativas += 1
-                                print(f"[ERRO]: Erro na transmissão. Tentativa {tentativas}/5...")
-                                
-                            if tentativas == 5:  # Se falhar 5 vezes, lança uma exceção
-                                raise Exception("Falha na transmissão do arquivo.")
+                            client.sendall(chunk)
 
                     print("[SUCESSO]: Arquivo enviado com sucesso")
                 else:
