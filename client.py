@@ -16,6 +16,8 @@ HOST = config['frontend_ip']
 PORT = config['frontend_port']
 NUM_CORES = config['cores']
 
+start_time = None
+
 # Função para processar uma tarefa
 def process_task(task):
     print(f"[PROCESSANDO] {task}")
@@ -36,7 +38,7 @@ def process_task(task):
         print(f"[ERRO]: O arquivo {file_path} não foi encontrado.")
         return None
 
-    return {'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name, 'file_size': file_size}
+    return {'id': task['id'], 'acc_media': acc_media, 'file_path': file_path, 'file_name': file_name, 'file_size': file_size}
 
 def verifica_modelos_dir(diretorio: str):
     if os.path.exists(diretorio):
@@ -55,6 +57,7 @@ def verifica_modelos_dir(diretorio: str):
 
 # Função principal do cliente
 def run_client():
+    global start_time
     verifica_modelos_dir('modelos')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.connect((HOST, PORT))
@@ -70,6 +73,8 @@ def run_client():
                     print('log 1')
                     tasks = json.loads(data.decode('utf-8'))  # Tenta converter para JSON
                     print("[Tasks recebidas com sucesso]. Iniciando Processamento:", tasks)  # Sucesso, pode processar
+                    start_time = time.time()
+                    print("[INICIANDO O TIMER]")
 
                 except json.JSONDecodeError:
                     print("[Esperando Tasks]...")
@@ -93,7 +98,10 @@ def run_client():
                         melhor_task = result
                         maior_acc_media = result["acc_media"]
 
-                result_data = {"success": True, "results": melhor_task}
+                end_time = time.time()
+                execution_time = end_time - start_time
+
+                result_data = {"success": True, "results": {"melhor_task": melhor_task, "tempo_task_Executada": execution_time}}
                 json_data = json.dumps(result_data)
                 client.sendall(json_data.encode("utf-8"))
 
