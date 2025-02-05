@@ -73,6 +73,27 @@ def handle_client(conn, addr):
 
                         if result["success"]:
                             print(f"[SUCESSO] Cliente {addr} completou tarefas")
+
+                            #AQUI COMEÇA A PARTE DE SALVAR O RESULTADO PARA CASO DE FALAHAR O SERVIDOR, para nao perder tudo que ja processou
+                            melhor_task = result["results"]["melhor_task"]
+                            tempo_task_Executada = result["results"]["tempo_task_Executada"]
+                            
+                            with open("resultados.json", "r") as f:
+                                dados = json.load(f)
+
+                            tasks_executadas = dados.get("tasks_executadas", [])
+                            melhores_tasks = dados.get("melhores_tasks", [])  # Retorna uma lista vazia se a chave não existir
+                            tempo_total_gasto = dados.get("tempo_total_gasto")  # Retorna None se a chave não existir
+
+                            tasks_executadas.append(tasks["id"])
+                            melhores_tasks.append(melhor_task["id"])
+                            tempo_total_gasto += tempo_task_Executada
+                            # Salvando os dados de volta no JSON
+                            with open("resultados.json", "w") as f:
+                                json.dump(dados, f, indent=4)
+
+                            print("Resultados salvos com sucesso!")
+                            
                             print('Arquivo .pth será enviado')
 
                             save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
@@ -93,7 +114,7 @@ def handle_client(conn, addr):
                                 acc_media = result["results"]["acc_media"]
                                 melhroes_tasks.append({"acc_media": acc_media, "save_path": save_path})
                             else:
-                                print(f"[ERRO] Dados incompletos. Recebido: {received_data} bytes, esperado: {file_size} bytes")
+                                print(f"[ERRO] Arquivo não salvo. Recebido: {received_data}, bytes, esperado: {file_size} bytes")
 
                         else:
                             print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
@@ -150,15 +171,26 @@ def config_queue():
         # Gera todas as combinações possíveis
         combinacoes = product(modelos, epocas, learning_rates, weight_decays)
 
+        with open("resultados.json", "r") as f:
+            dados = json.load(f)
+        tasks_executadas = dados.get('tasks_executadas', [])
+
         # adiciona as combinações a fila
+        
+        i = 1
         for combinacao in combinacoes:
             tarefa = {
+                "id": i,
                 "model_names": [combinacao[0]],
                 "epochs": [combinacao[1]],
                 "learning_rates": [combinacao[2]],
                 "weight_decays": [combinacao[3]]
             }
+            if i in tasks_executadas:
+                i += 1
+                continue
             task_queue.put(tarefa)
+            i += 1
 
         # Salva as combinações no arquivo de configuração
         config['fila_task'] = list(task_queue.queue)  # Converte a fila para uma lista antes de salvar
