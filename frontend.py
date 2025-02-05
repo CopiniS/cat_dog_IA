@@ -159,6 +159,12 @@ def handle_client(conn, addr):
         
 
 def config_queue():
+    
+    with open("resultados.json", "r") as f:
+        dados = json.load(f)
+    tasks_executadas = dados.get('tasks_executadas', [])
+
+    
     if 'fila_task' not in config or not config['fila_task']:
         # Parâmetros para gerar combinações
         modelos = ["alexnet", "mobilenet_v3_large", "mobilenet_v3_small", "resnet18", "resnet101", "vgg11", "vgg19"]
@@ -168,10 +174,6 @@ def config_queue():
 
         # Gera todas as combinações possíveis
         combinacoes = product(modelos, epocas, learning_rates, weight_decays)
-
-        with open("resultados.json", "r") as f:
-            dados = json.load(f)
-        tasks_executadas = dados.get('tasks_executadas', [])
 
         # adiciona as combinações a fila
         
@@ -200,15 +202,15 @@ def config_queue():
         print("A fila já existe no arquivo de configuração. Carregando...")
 
     # Exemplo de como acessar a fila a partir do arquivo de configuração
-    max_tasks = config.get('max_tasks', len(config['fila_task']))  # Limite de tarefas na fila
+        max_tasks = config.get('max_tasks', len(config['fila_task']))  # Limite de tarefas na fila
 
-    i = 1
-    for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
-        if any(task["id"] == i for task in tasks_executadas):
+        i = 1
+        for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
+            if any(task["id"] == i for task in tasks_executadas):
+                i += 1
+                continue
+            task_queue.put(tarefa)
             i += 1
-            continue
-        task_queue.put(tarefa)
-        i += 1
 
 # def verifica_modelos_dir(diretorio: str):
 #     if os.path.exists(diretorio):
