@@ -67,15 +67,12 @@ def run_client():
                 tasks = []
                 # O try é porque o data pode vir como b'OKOKKOKOKOK
                 try:
+                    print('log 1')
                     tasks = json.loads(data.decode('utf-8'))  # Tenta converter para JSON
                     print("[Tasks recebidas com sucesso]. Iniciando Processamento:", tasks)  # Sucesso, pode processar
 
                 except json.JSONDecodeError:
                     print("[Esperando Tasks]...")
-
-                if not tasks:
-                    print("[NENHUMA TAREFA] Nenhuma tarefa recebida, aguardando...")
-                    time.sleep(5)
                     continue
 
                 # Processa tarefas

@@ -28,26 +28,82 @@ class CNN:
         return soma / replicacoes, iter_acc_max
         
     
+    # def create_model(self, model_name):
+    #     if (model_name=='VGG11'):
+    #         model = models.vgg11(weights='DEFAULT')  
+    #         for param in model.parameters():
+    #             param.requires_grad = False
+    #         model.classifier[6] = nn.Linear(model.classifier[6].in_features,2)
+    #         return model
+    #     elif (model_name=='Alexnet'):
+    #         model = models.alexnet(weights='DEFAULT')  
+    #         for param in model.parameters():
+    #             param.requires_grad = False
+    #         model.classifier[6] = nn.Linear(model.classifier[6].in_features,2)
+    #         return model
+    #     else: # 'if (model_name=='MobilenetV3Large' ou qualquer outra coisa para não dar erro)
+    #         model = models.mobilenet_v3_large(weights='DEFAULT')  
+    #         for param in model.parameters():
+    #             param.requires_grad = False
+    #         model.classifier[3] = nn.Linear(model.classifier[3].in_features,2)
+    #         return model
+
     def create_model(self, model_name):
-        if (model_name=='VGG11'):
-            model = models.vgg11(weights='DEFAULT')  
-            for param in model.parameters():
-                param.requires_grad = False
-            model.classifier[6] = nn.Linear(model.classifier[6].in_features,2)
-            return model
-        elif (model_name=='Alexnet'):
-            model = models.alexnet(weights='DEFAULT')  
-            for param in model.parameters():
-                param.requires_grad = False
-            model.classifier[6] = nn.Linear(model.classifier[6].in_features,2)
-            return model
-        else: # 'if (model_name=='MobilenetV3Large' ou qualquer outra coisa para não dar erro)
-            model = models.mobilenet_v3_large(weights='DEFAULT')  
-            for param in model.parameters():
-                param.requires_grad = False
-            model.classifier[3] = nn.Linear(model.classifier[3].in_features,2)
-            return model
-   
+        match model_name:
+            case 'alexnet':
+                model = models.alexnet(weights = 'DEFAULT')
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, 2)
+                return model
+
+            case 'mobilenet_v3_large':
+                model = models.mobilenet_v3_large(weights = 'DEFAULT')  
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.classifier[3] = nn.Linear(model.classifier[3].in_features, 2)
+                return model
+
+            case 'mobilenet_v3_small':
+                model = models.mobilenet_v3_small(weights = 'DEFAULT')
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.classifier[3] = nn.Linear(model.classifier[3].in_features, 2)
+                return model
+
+            case 'resnet18':
+                model = models.resnet18(weights = 'DEFAULT')
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.fc = nn.Linear(model.fc.in_features, 2)
+                return model
+
+            case 'resnet101':
+                model = models.resnet101(weights = 'DEFAULT')
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.fc = nn.Linear(model.fc.in_features, 2)
+                return model
+
+            case 'vgg11':
+                model = models.vgg11(weights = 'DEFAULT')
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, 2)
+                return model
+
+            case 'vgg19':
+                model = models.vgg19(weights = 'DEFAULT')
+                for param in model.parameters():
+                    param.requires_grad = False
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, 2)
+                return model
+
+            case _:
+                raise ValueError(f"Model {model_name} not suported.")
+
+
+
     def create_optimizer(self, model, learning_rate, weight_decay):
         update = []
         for name,param in model.named_parameters():

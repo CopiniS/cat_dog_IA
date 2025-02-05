@@ -13,7 +13,7 @@ from datetime import timedelta
 # Configurações do servidor
 with open("config.json", "r") as f:
     config = json.load(f)
-QUANT_TASKS = config['quant_tasks']
+QUANT_TASKS = config.get('quant_tasks', len(config['fila_task']))  # quantas tasks envia por vez
 
 HOST = config['frontend_ip'] # Endereço do servidor
 PORT = config['frontend_port']        # Porta do servidor
@@ -143,7 +143,7 @@ def config_queue():
     if 'fila_task' not in config or not config['fila_task']:
         # Parâmetros para gerar combinações
         modelos = ["alexnet", "mobilenet_v3_large", "mobilenet_v3_small", "resnet18", "resnet101", "vgg11", "vgg19"]
-        epocas = [10, 20]
+        epocas = [5, 10]
         learning_rates = [0.001, 0.0001, 0.00001]
         weight_decays = [0, 0.0001]
 
