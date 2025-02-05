@@ -105,18 +105,6 @@ def run_client():
                 json_data = json.dumps(result_data)
                 client.sendall(json_data.encode("utf-8"))
 
-                if result_data['success']:
-                    print("[SUCESSO NO TRINAMENTO]: Treinamento realizado com sucesso. Enviando o arquivo pth...")
-
-                    # Enviar o arquivo em pedaços de 4KB
-                    with open(result_data["results"]["file_path"], 'rb') as file:
-                        while chunk := file.read(4096):  # 4 KB chunks
-                            client.sendall(chunk)
-
-                    print("[SUCESSO]: Arquivo enviado com sucesso")
-                else:
-                    print("[ERRO]: falha no treinamento. Nenhum arquivo será enviado.")
-
             except Exception as e:
                 print(f"[ERRO] {e}")
                 break

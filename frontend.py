@@ -27,12 +27,10 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 task_queue = queue.Queue()
 
 start_time = None
-end_time = None
 
 # Clientes conectados
 clients = {}
 lock = threading.Lock()
-melhroes_tasks = []
 
 # Função para lidar com clientes
 def handle_client(conn, addr):
@@ -86,35 +84,35 @@ def handle_client(conn, addr):
                             tempo_total_gasto = dados.get("tempo_total_gasto")  # Retorna None se a chave não existir
 
                             tasks_executadas.append(tasks["id"])
-                            melhores_tasks.append(melhor_task["id"])
+                            melhores_tasks.append({"id": melhor_task["id"], "acc_media": melhor_task["acc_media"]})
                             tempo_total_gasto += tempo_task_Executada
                             # Salvando os dados de volta no JSON
                             with open("resultados.json", "w") as f:
                                 json.dump(dados, f, indent=4)
 
-                            print("Resultados salvos com sucesso!")
+                            print("[SUCESSO] Resultados salvos com sucesso!")
                             
-                            print('Arquivo .pth será enviado')
+                            # print('Arquivo .pth será enviado')
 
-                            save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
-                            file_size = int(result["results"]["file_size"])  # Novo campo vindo do cliente
-                            received_data = 0
+                            # save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
+                            # file_size = int(result["results"]["file_size"])  # Novo campo vindo do cliente
+                            # received_data = 0
 
-                            # Receber o arquivo
-                            with open(save_path, 'wb') as file:
-                                while received_data < file_size:
-                                    file_data = conn.recv(4096)  # 4 KB chunks
-                                    if not file_data:
-                                        break
-                                    file.write(file_data)
-                                    received_data += len(file_data)  # Incrementa o total recebido
-                                    # conn.sendall(b'OK')  # Confirmação de recebimento
-                            if received_data == file_size:
-                                print(f"[SUCESSO]: Arquivo salvo como {save_path}")
-                                acc_media = result["results"]["acc_media"]
-                                melhroes_tasks.append({"acc_media": acc_media, "save_path": save_path})
-                            else:
-                                print(f"[ERRO] Arquivo não salvo. Recebido: {received_data}, bytes, esperado: {file_size} bytes")
+                            # # Receber o arquivo
+                            # with open(save_path, 'wb') as file:
+                            #     while received_data < file_size:
+                            #         file_data = conn.recv(4096)  # 4 KB chunks
+                            #         if not file_data:
+                            #             break
+                            #         file.write(file_data)
+                            #         received_data += len(file_data)  # Incrementa o total recebido
+                            #         # conn.sendall(b'OK')  # Confirmação de recebimento
+                            # if received_data == file_size:
+                            #     print(f"[SUCESSO]: Arquivo salvo como {save_path}")
+                            #     acc_media = result["results"]["acc_media"]
+                            #     melhroes_tasks.append({"acc_media": acc_media, "save_path": save_path})
+                            # else:
+                            #     print(f"[ERRO] Arquivo não salvo. Recebido: {received_data}, bytes, esperado: {file_size} bytes")
 
                         else:
                             print(f"[ERRO] Cliente {addr} não completou as tarefas, retornando para a fila")
@@ -186,7 +184,7 @@ def config_queue():
                 "learning_rates": [combinacao[2]],
                 "weight_decays": [combinacao[3]]
             }
-            if i in tasks_executadas:
+            if any(task["id"] == i for task in tasks_executadas):
                 i += 1
                 continue
             task_queue.put(tarefa)
@@ -204,23 +202,28 @@ def config_queue():
     # Exemplo de como acessar a fila a partir do arquivo de configuração
     max_tasks = config.get('max_tasks', len(config['fila_task']))  # Limite de tarefas na fila
 
+    i = 1
     for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
+        if any(task["id"] == i for task in tasks_executadas):
+            i += 1
+            continue
         task_queue.put(tarefa)
+        i += 1
 
-def verifica_modelos_dir(diretorio: str):
-    if os.path.exists(diretorio):
-    # Remove todos os arquivos dentro do diretório
-        for arquivo in os.listdir(diretorio):
-            caminho_arquivo = os.path.join(diretorio, arquivo)
-            try:
-                if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
-                    os.unlink(caminho_arquivo)  # Apaga arquivos e links simbólicos
-            except Exception as e:
-                print(f"[ERRO]: Erro ao apagar {caminho_arquivo}: {e}")
-    else:
-        # Cria o diretório se ele não existir
-        os.makedirs(diretorio)
-        print(f"Diretório modelos criado com sucesso.")
+# def verifica_modelos_dir(diretorio: str):
+#     if os.path.exists(diretorio):
+#     # Remove todos os arquivos dentro do diretório
+#         for arquivo in os.listdir(diretorio):
+#             caminho_arquivo = os.path.join(diretorio, arquivo)
+#             try:
+#                 if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
+#                     os.unlink(caminho_arquivo)  # Apaga arquivos e links simbólicos
+#             except Exception as e:
+#                 print(f"[ERRO]: Erro ao apagar {caminho_arquivo}: {e}")
+#     else:
+#         # Cria o diretório se ele não existir
+#         os.makedirs(diretorio)
+#         print(f"Diretório modelos criado com sucesso.")
 
 def should_stop_server():
     with lock:
@@ -231,19 +234,38 @@ def should_stop_server():
     return False
 
 def exibir_resultados():
-    global end_time
     # Encontrando o objeto com o maior valor em acc_media
-    if melhroes_tasks:
-        melhor_task = max(melhroes_tasks, key=lambda x: x["acc_media"])
+    with open('resultados.json', 'r') as f:
+        dados = json.load(f)
 
-        end_time = time.time()
-        execution_time = end_time - start_time
-        formatted_time = str(timedelta(seconds=int(execution_time)))
-        print('[RESULTADOS]')
-        print(f"O melhor modelo treinado é o arquivo { melhor_task['save_path'] }")
-        print(f"Acurácia média de { melhor_task['acc_media'] }")
+    melhores_tasks = dados['melhores_tasks']
+    tempo_tasks_somado = dados['tempo_total_gasto']
+    melhor_task = dados['melhor_task']
+    
+    end_time = time.time()
+    execution_time = end_time - start_time
+    #Maior o tempo de execução por tasks somado e o tempo de execução sequencial
+    correct_time = max(tempo_tasks_somado, execution_time)
+    formatted_time = str(timedelta(seconds=int(correct_time)))
+
+    if melhores_tasks:
+        melhor_task = max(melhores_tasks, key=lambda x: x["acc_media"])
+
+        with open('config.json', 'r') as f:
+            lista_tasks = json.load(f)['fila_tasks']
+
+        melhor_task_completa = next((task for task in lista_tasks if task["id"] == melhor_task["id"]), None)
+
+        if melhor_task_completa:
+            print('[RESULTADOS]')
+            print(f"A melhor combinação foi:")
+            print(f"model_names: {melhor_task_completa["model_names"]}")
+            print(f"epochs: {melhor_task_completa["epochs"]}")
+            print(f"learning_rates: {melhor_task_completa["learning_rates"]}")
+            print(f"weight_decays: {melhor_task_completa["weight_decays"]}")
+            print(f"Teve a Acurácia média de { melhor_task['acc_media'] }")
     else:
-        print('[ERRO]: não conseguiu receber o melhor modelo')
+        print('[ERRO]: não conseguiu achar o melhor modelo')
     print(f"Tempo de execução de { formatted_time }")
 
     
@@ -253,7 +275,7 @@ def exibir_resultados():
 def main():
     # Adicionando tarefas a queue
     config_queue()
-    verifica_modelos_dir('melhores_modelos')
+    # verifica_modelos_dir('melhores_modelos')
 
     # Inicialização do servidor
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:

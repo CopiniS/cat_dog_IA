@@ -1,5 +1,6 @@
 {
     "tasks_executadas": [],
     "melhores_tasks": [],
-    "tempo_total_gasto": 0
+    "tempo_total_gasto": 0,
+    "melhor_task": {}
 }
