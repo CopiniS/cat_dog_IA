@@ -206,11 +206,14 @@ def config_queue():
         max_tasks = config.get('max_tasks', len(config['fila_task']))  # Limite de tarefas na fila
 
         i = 1
-        for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
+        for tarefa in config['fila_task']:  # Respeita o limite definido
             if any(task == i for task in tasks_executadas):
                 i += 1
                 continue
             task_queue.put(tarefa)
+            # Se atingir o numero maximo de tasks configuradas, para de adicionar a lista
+            if task_queue.qsize() == max_tasks:
+                break
             i += 1
 
 # def verifica_modelos_dir(diretorio: str):
