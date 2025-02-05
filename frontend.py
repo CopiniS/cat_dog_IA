@@ -18,10 +18,6 @@ QUANT_TASKS = config.get('quant_tasks', len(config['fila_task']))  # quantas tas
 HOST = config['frontend_ip'] # Endereço do servidor
 PORT = config['frontend_port']        # Porta do servidor
 TIMEOUT = config["timeout_minutes"] * 60    # Timeout
-SAVE_DIR = "melhores_modelos"  # Diretório para salvar arquivos recebidos
-
-# Garante que o diretório existe
-os.makedirs(SAVE_DIR, exist_ok=True)
 
 # Fila de tarefas compartilhada
 task_queue = queue.Queue()
@@ -34,14 +30,8 @@ lock = threading.Lock()
 
 # Função para lidar com clientes
 def handle_client(conn, addr):
-    global start_time
     try:
         print(f"[CONEXÃO ESTABELECIDA] {addr}")
-
-        # Inicia o timer no primeiro cliente
-        if start_time is None:
-            start_time = time.time()
-            print("[INICIANDO O TIMER]")
 
         while True:
             with lock:
@@ -71,27 +61,38 @@ def handle_client(conn, addr):
 
                         if result["success"]:
                             print(f"[SUCESSO] Cliente {addr} completou tarefas")
+                            try:
+                                #AQUI COMEÇA A PARTE DE SALVAR O RESULTADO PARA CASO DE FALAHAR O SERVIDOR, para nao perder tudo que ja processou
+                                melhor_task = result["results"]["melhor_task"]
+                                tempo_task_Executada = result["results"]["tempo_task_Executada"]
 
-                            #AQUI COMEÇA A PARTE DE SALVAR O RESULTADO PARA CASO DE FALAHAR O SERVIDOR, para nao perder tudo que ja processou
-                            melhor_task = result["results"]["melhor_task"]
-                            tempo_task_Executada = result["results"]["tempo_task_Executada"]
-                            
-                            with open("resultados.json", "r") as f:
-                                dados = json.load(f)
+                                print('result["results"]["tempo_task_Executada"]: ', (result["results"]["tempo_task_Executada"]))
+                                print('result["results"]: ', (result["results"]))
 
-                            tasks_executadas = dados.get("tasks_executadas", [])
-                            melhores_tasks = dados.get("melhores_tasks", [])  # Retorna uma lista vazia se a chave não existir
-                            tempo_total_gasto = dados.get("tempo_total_gasto")  # Retorna None se a chave não existir
+                                
+                                with open("resultados.json", "r") as f:
+                                    dados = json.load(f)
 
-                            tasks_executadas.append(tasks["id"])
-                            melhores_tasks.append({"id": melhor_task["id"], "acc_media": melhor_task["acc_media"]})
-                            tempo_total_gasto += tempo_task_Executada
-                            # Salvando os dados de volta no JSON
-                            with open("resultados.json", "w") as f:
-                                json.dump(dados, f, indent=4)
 
-                            print("[SUCESSO] Resultados salvos com sucesso!")
-                            
+                                tasks_executadas = dados.get("tasks_executadas", [])
+                                melhores_tasks = dados.get("melhores_tasks", [])  # Retorna uma lista vazia se a chave não existir
+                                tempo_total_gasto = dados.get("tempo_total_gasto", 0)  # Retorna None se a chave não existir
+
+                                tasks_executadas.extend(task["id"] for task in tasks)
+                                melhores_tasks.append({"id": melhor_task["id"], "acc_media": melhor_task["acc_media"]})
+                                tempo_total_gasto += tempo_task_Executada
+                                
+                                dados["tasks_executadas"] = tasks_executadas
+                                dados["melhores_tasks"] = melhores_tasks
+                                dados["tempo_total_gasto"] = tempo_total_gasto
+                                # Salvando os dados de volta no JSON
+                                with open("resultados.json", "w") as f:
+                                    json.dump(dados, f, indent=4)
+
+                                print("[SUCESSO] Resultados salvos com sucesso!")
+                            except Exception as e:
+                                print(f"[ERRO] Falha ao salvar o resultado: {e}")
+
                             # print('Arquivo .pth será enviado')
 
                             # save_path = os.path.join(SAVE_DIR, result["results"]["file_name"])
@@ -186,7 +187,7 @@ def config_queue():
                 "learning_rates": [combinacao[2]],
                 "weight_decays": [combinacao[3]]
             }
-            if any(task["id"] == i for task in tasks_executadas):
+            if any(task == i for task in tasks_executadas):
                 i += 1
                 continue
             task_queue.put(tarefa)
@@ -206,7 +207,7 @@ def config_queue():
 
         i = 1
         for tarefa in config['fila_task'][:max_tasks]:  # Respeita o limite definido
-            if any(task["id"] == i for task in tasks_executadas):
+            if any(task == i for task in tasks_executadas):
                 i += 1
                 continue
             task_queue.put(tarefa)
@@ -240,9 +241,9 @@ def exibir_resultados():
     with open('resultados.json', 'r') as f:
         dados = json.load(f)
 
-    melhores_tasks = dados['melhores_tasks']
-    tempo_tasks_somado = dados['tempo_total_gasto']
-    melhor_task = dados['melhor_task']
+    melhores_tasks = dados.get('melhores_tasks', [])
+    tempo_tasks_somado = dados.get('tempo_total_gasto', 0)
+    melhor_task = dados.get('melhor_task', None)
     
     end_time = time.time()
     execution_time = end_time - start_time
@@ -254,17 +255,17 @@ def exibir_resultados():
         melhor_task = max(melhores_tasks, key=lambda x: x["acc_media"])
 
         with open('config.json', 'r') as f:
-            lista_tasks = json.load(f)['fila_tasks']
+            dados_fila = json.load(f)
 
-        melhor_task_completa = next((task for task in lista_tasks if task["id"] == melhor_task["id"]), None)
+        melhor_task_completa = next((task for task in dados_fila['fila_task'] if task["id"] == melhor_task["id"]), None)
 
         if melhor_task_completa:
             print('[RESULTADOS]')
             print(f"A melhor combinação foi:")
-            print(f"model_names: {melhor_task_completa["model_names"]}")
-            print(f"epochs: {melhor_task_completa["epochs"]}")
-            print(f"learning_rates: {melhor_task_completa["learning_rates"]}")
-            print(f"weight_decays: {melhor_task_completa["weight_decays"]}")
+            print(f"model_names: {melhor_task_completa['model_names']}")
+            print(f"epochs: {melhor_task_completa['epochs']}")
+            print(f"learning_rates: {melhor_task_completa['learning_rates']}")
+            print(f"weight_decays: {melhor_task_completa['weight_decays']}")
             print(f"Teve a Acurácia média de { melhor_task['acc_media'] }")
     else:
         print('[ERRO]: não conseguiu achar o melhor modelo')
@@ -275,6 +276,7 @@ def exibir_resultados():
 
 # Função principal do servidor
 def main():
+    global start_time
     # Adicionando tarefas a queue
     config_queue()
     # verifica_modelos_dir('melhores_modelos')
@@ -284,6 +286,9 @@ def main():
         server.bind((HOST, PORT))
         server.listen(5)
         print(f"[SERVIDOR INICIADO] Escutando em {HOST}:{PORT}")
+
+        start_time = time.time()
+        print("[INICIANDO O TIMER]")
 
         with ThreadPoolExecutor() as executor:
             while True:

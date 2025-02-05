@@ -3,9 +3,9 @@
     "frontend_ip": "127.0.0.1",
     "frontend_port": 5000,
     "timeout_minutes": 20,
-    "replicacoes": 10,
-    "max_tasks": 20,
-    "quant_tasks": 4,
+    "replicacoes": 2,
+    "max_tasks": 40,
+    "quant_tasks": 8,
     "fila_task": [
         {
             "id": 1,

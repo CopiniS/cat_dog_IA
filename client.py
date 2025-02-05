@@ -78,6 +78,7 @@ def run_client():
 
                 except json.JSONDecodeError:
                     print("[Esperando Tasks]...")
+                    time.sleep(3)
                     continue
 
                 # Processa tarefas
