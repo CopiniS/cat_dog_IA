@@ -212,7 +212,7 @@ def config_queue():
                 continue
             task_queue.put(tarefa)
             # Se atingir o numero maximo de tasks configuradas, para de adicionar a lista
-            if task_queue.qsize() == max_tasks:
+            if max_tasks and task_queue.qsize() == max_tasks:
                 break
             i += 1
 
