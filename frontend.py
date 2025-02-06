@@ -75,15 +75,17 @@ def handle_client(conn, addr):
 
 
                                 tasks_executadas = dados.get("tasks_executadas", [])
-                                melhores_tasks = dados.get("melhores_tasks", [])  # Retorna uma lista vazia se a chave não existir
+                                melhor_task_atual = dados.get("melhor_task_atual", None)  # Retorna uma lista vazia se a chave não existir
                                 tempo_total_gasto = dados.get("tempo_total_gasto", 0)  # Retorna None se a chave não existir
 
                                 tasks_executadas.extend(task["id"] for task in tasks)
-                                melhores_tasks.append({"id": melhor_task["id"], "acc_media": melhor_task["acc_media"]})
                                 tempo_total_gasto += tempo_task_Executada
+
+                                if not melhor_task_atual or melhor_task_atual['acc_media'] < melhor_task["acc_media"]:
+                                    melhor_task_atual = {"id": melhor_task["id"], "acc_media": melhor_task["acc_media"]}
                                 
                                 dados["tasks_executadas"] = tasks_executadas
-                                dados["melhores_tasks"] = melhores_tasks
+                                dados["melhor_task_atual"] = melhor_task_atual
                                 dados["tempo_total_gasto"] = tempo_total_gasto
                                 # Salvando os dados de volta no JSON
                                 with open("resultados.json", "w") as f:
@@ -244,7 +246,7 @@ def exibir_resultados():
     with open('resultados.json', 'r') as f:
         dados = json.load(f)
 
-    melhores_tasks = dados.get('melhores_tasks', [])
+    melhor_task_atual = dados.get('melhor_task_atual', [])
     tempo_tasks_somado = dados.get('tempo_total_gasto', 0)
     melhor_task = dados.get('melhor_task', None)
     
@@ -254,8 +256,8 @@ def exibir_resultados():
     correct_time = max(tempo_tasks_somado, execution_time)
     formatted_time = str(timedelta(seconds=int(correct_time)))
 
-    if melhores_tasks:
-        melhor_task = max(melhores_tasks, key=lambda x: x["acc_media"])
+    if melhor_task_atual:
+        melhor_task = max(melhor_task_atual, key=lambda x: x["acc_media"])
 
         with open('config.json', 'r') as f:
             dados_fila = json.load(f)
