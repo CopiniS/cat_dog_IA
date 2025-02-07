@@ -2,7 +2,7 @@
     "cores": 1,
     "frontend_ip": "127.0.0.1",
     "frontend_port": 5000,
-    "timeout_minutes": 120,
+    "timeout_minutes": 180,
     "replicacoes": 10,
     "max_tasks": null,
     "quant_tasks": 2,
