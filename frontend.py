@@ -246,9 +246,8 @@ def exibir_resultados():
     with open('resultados.json', 'r') as f:
         dados = json.load(f)
 
-    melhor_task_atual = dados.get('melhor_task_atual', [])
+    melhor_task_atual = dados.get('melhor_task_atual', None)
     tempo_tasks_somado = dados.get('tempo_total_gasto', 0)
-    melhor_task = dados.get('melhor_task', None)
     
     end_time = time.time()
     execution_time = end_time - start_time
@@ -257,21 +256,20 @@ def exibir_resultados():
     formatted_time = str(timedelta(seconds=int(correct_time)))
 
     if melhor_task_atual:
-        melhor_task = max(melhor_task_atual, key=lambda x: x["acc_media"])
 
         with open('config.json', 'r') as f:
             dados_fila = json.load(f)
 
-        melhor_task_completa = next((task for task in dados_fila['fila_task'] if task["id"] == melhor_task["id"]), None)
+        melhor_task_completa = next((task for task in dados_fila['fila_task'] if task["id"] == melhor_task_atual["id"]), None)
 
         if melhor_task_completa:
             print('[RESULTADOS]')
-            print(f"A melhor combinação foi:")
+            print(f"A melhor combinação foi do id {melhor_task_completa['id']}:")
             print(f"model_names: {melhor_task_completa['model_names']}")
             print(f"epochs: {melhor_task_completa['epochs']}")
             print(f"learning_rates: {melhor_task_completa['learning_rates']}")
             print(f"weight_decays: {melhor_task_completa['weight_decays']}")
-            print(f"Teve a Acurácia média de { melhor_task['acc_media'] }")
+            print(f"Teve a Acurácia média de { melhor_task_atual['acc_media'] }")
     else:
         print('[ERRO]: não conseguiu achar o melhor modelo')
     print(f"Tempo de execução de { formatted_time }")
