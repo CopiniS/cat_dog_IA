@@ -1,0 +1,1271 @@
+{
+    "cores": 2,
+    "frontend_ip": "10.1.1.108",
+    "frontend_port": 5000,
+    "timeout_minutes": 300,
+    "replicacoes": 10,
+    "max_tasks": null,
+    "quant_tasks": 4,
+    "fila_task": [
+        {
+            "id": 1,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 2,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 3,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 4,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 5,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 6,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 7,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 8,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 9,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 10,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 11,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 12,
+            "model_names": [
+                "alexnet"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 13,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 14,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 15,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 16,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 17,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 18,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 19,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 20,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 21,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 22,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 23,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 24,
+            "model_names": [
+                "mobilenet_v3_large"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 25,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 26,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 27,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 28,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 29,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 30,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 31,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 32,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 33,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 34,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 35,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 36,
+            "model_names": [
+                "mobilenet_v3_small"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 37,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 38,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 39,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 40,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 41,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 42,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 43,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 44,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 45,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 46,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 47,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 48,
+            "model_names": [
+                "resnet18"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 49,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 50,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 51,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 52,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 53,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 54,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 55,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 56,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 57,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 58,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 59,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 60,
+            "model_names": [
+                "resnet101"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 61,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 62,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 63,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 64,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 65,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 66,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 67,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 68,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 69,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 70,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 71,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 72,
+            "model_names": [
+                "vgg11"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 73,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 74,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 75,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 76,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 77,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 78,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                5
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 79,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 80,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 81,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 82,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                0.0001
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        },
+        {
+            "id": 83,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0
+            ]
+        },
+        {
+            "id": 84,
+            "model_names": [
+                "vgg19"
+            ],
+            "epochs": [
+                10
+            ],
+            "learning_rates": [
+                1e-05
+            ],
+            "weight_decays": [
+                0.0001
+            ]
+        }
+    ]
+}
